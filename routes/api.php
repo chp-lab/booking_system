@@ -23,10 +23,14 @@ Route::group(['middleware' => ['cors']], function () {
     Route::post('v1/checkAvailableRoom', 'App\Http\Controllers\BookingController@checkAvailableRoom')->middleware('log.route');
     Route::post('v1/booking', 'App\Http\Controllers\BookingController@booking')->middleware('log.route');
     Route::post('v1/unlock/{user_token?}', 'App\Http\Controllers\BookingController@unlock')->middleware('log.route');
-
     Route::get('v1/ejectBooking/{one_email?}/{booking_number?}', 'App\Http\Controllers\BookingController@ejectBooking')->middleware('log.route');
+
     Route::get('v1/bookingTable/{one_email?}/{select?}/{date?}', 'App\Http\Controllers\BookingController@bookingTable')->middleware('log.route');
     Route::get('v1/userTable/{select?}/{one_email?}', 'App\Http\Controllers\BookingController@userTable')->middleware('log.route');
+    Route::get('v1/roomTable', 'App\Http\Controllers\BookingController@roomTable')->middleware('log.route');
     Route::get('v1/getProfile/{user_token?}', 'App\Http\Controllers\BookingController@getProfile')->middleware('log.route');
+    Route::get('v1/nowMeetingTable/{room_num?}', 'App\Http\Controllers\BookingController@nowMeetingTable')->middleware('log.route');
+    Route::get('v1/availableStat/{day?}', 'App\Http\Controllers\BookingController@availableStat')->middleware('log.route');
+
 });
 
