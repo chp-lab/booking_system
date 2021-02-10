@@ -32,13 +32,18 @@ class BookingController extends Controller
 
 
     public function availableStat($day = null){
+
+        if(!is_numeric($day)){
+            return response()->json(['Status' => 'fail', 'Message' => "day should be number"], 400);
+        }
+
         $booking_data_json = [];
         $room_data_json = [];
         $timeNow = Carbon::now();
         $timeNow->tz = new \DateTimeZone('Asia/Bangkok');
         $green = new \DateTime('04:00');
         $red = new \DateTime('22:00');
-
+        
         $roomsTable = Room::where($this->main_door, '=', null)->get();
         
         if(is_null($day)){
@@ -98,7 +103,7 @@ class BookingController extends Controller
             $start->adddays(1);
         }
 
-        return response()->json(['Status' => 'success', 'Value' => $booking_data_json], 200);
+        return response()->json(['Status' => 'success', 'Message' => "", 'Value' => $booking_data_json], 200);
     }
 
     public function nowMeetingTable($room_num = null){
@@ -114,8 +119,8 @@ class BookingController extends Controller
         }else{
             $rooms = Room::where($this->room_num, '=', $room_num)->first();
             if(is_null($rooms)){
-                return response()->json([ 'Status' => 'Fail',
-                                          'Message' => 'Room Number is Invalid'
+                return response()->json([ 'Status' => 'fail',
+                                          'Message' => 'room number is invalid'
                                         ], 404);
             }
             $bookingTable = Booking::join('rooms', 'bookings.room_num', '=', 'rooms.room_num')
@@ -147,15 +152,16 @@ class BookingController extends Controller
         }
 
         if(count($booking_data_json) == 0){
-            return response()->json([ 'Status' => 'Success', 'Message' => 'No Meeting Rightnow', 'Value' => $booking_data_json], 200);
+            return response()->json([ 'Status' => 'success', 'Message' => 'mo meeting rightnow', 'Value' => $booking_data_json], 200);
         }else{
-            return response()->json([ 'Status' => 'Success', 'Message' => '', 'Value' => $booking_data_json], 200);
+            return response()->json([ 'Status' => 'success', 'Message' => '', 'Value' => $booking_data_json], 200);
         }
     }
 
     public function bookingTable($one_email = null, $select = null, $date = null){   
         $booking_data_this_month = [];
         $booking_data_next_month = [];
+        $booking_data_json = [];
         $timeNow = Carbon::now();
         $timeNow->tz = new \DateTimeZone('Asia/Bangkok');
 
@@ -223,7 +229,7 @@ class BookingController extends Controller
                 'next_month' => $booking_data_next_month
             ];
 
-            return response()->json(['Status' => 'success', "Value" => $value], 200);
+            return response()->json(['Status' => 'success', 'Message' => '', "Value" => $value], 200);
         }else{
             if($select == 'history'){
                 //***** must test *****
@@ -337,7 +343,7 @@ class BookingController extends Controller
                 foreach($booking_data_sort as $booking_data){
                     array_push($booking_data_sort_arr, $booking_data);
                 }
-                return response()->json($booking_data_sort_arr);
+                return response()->json(['Status' => 'success', 'Message' => '', "Value" => $booking_data_sort_arr], 200);
             }else if($select == 'future'){
                 $bookingTable = Booking::where($this->one_email , '=', $one_email)
                                     ->where($this->meeting_time_end, '>', $timeNow)
@@ -398,7 +404,7 @@ class BookingController extends Controller
                     array_push($booking_data_sort_arr, $booking_data);
                 }
 
-                return response()->json($booking_data_sort_arr, 200);
+                return response()->json(['Status' => 'success', 'Message' => '', "Value" => $booking_data_sort_arr], 200);
                 // return response()->json($booking_data_json);
             }else if($select == 'time'){
                 $start_date = $date . " 00:00:00";
@@ -465,9 +471,9 @@ class BookingController extends Controller
                     array_push($booking_data_sort_arr, $booking_data);
                 }
                 
-                return response()->json($booking_data_sort_arr, 200);
+                return response()->json(['Status' => 'success', 'Message' => '', "Value" => $booking_data_sort_arr], 200);
             }else{
-                return response()->json(['Status' => 'Page Not Found'], 404);
+                return response()->json(['Status' => 'fail', 'Message' => 'page not found'], 404);
             }
         }    
     }
@@ -477,10 +483,10 @@ class BookingController extends Controller
         if($select == 'all'){
             if(is_null($one_email)){
                 $userTable = User::all();
-                return response()->json(['Status' => 'Query Successful', 'Value' => $userTable], 200);
+                return response()->json(['Status' => 'success','Message' => '' ,'Value' => $userTable], 200);
             }else{
                 $userTable = User::where($this->one_email , '=', $one_email)->first();
-                return response()->json(['Status' => 'Query Successful', 'Value' => $userTable], 200);
+                return response()->json(['Status' => 'success', 'Message' => '' , 'Value' => $userTable], 200);
             }
         }else if($select == 'email'){
             $user_email_arr = array();
@@ -489,12 +495,12 @@ class BookingController extends Controller
                 foreach($userTable as $user){
                     array_push($user_email_arr, $user->one_email);
                 }
-                return response()->json(['Status' => 'Query Successful', 'Value' => $user_email_arr], 200);
+                return response()->json(['Status' => 'success', 'Message' => '', 'Value' => $user_email_arr], 200);
             }else{
-                return response()->json(['Status' => 'Page Not Found'], 404);
+                return response()->json(['Status' => 'fail', 'Message' => 'page not found'], 404);
             }
         }else{
-            return response()->json(['Status' => 'Page Not Found'], 404);
+            return response()->json(['Status' => 'fail', 'Message' => 'page not found'], 404);
         }
         
     }
@@ -525,16 +531,16 @@ class BookingController extends Controller
         if( is_null($request->get($this->meeting_time_start)) ||
             is_null($request->get($this->meeting_time_end))
         ){
-            return response()->json(['Status' => 'Some Value Might be Null'], 400);
+            return response()->json(['Status' => 'fail', 'Message' => 'some value might be null'], 400);
         }
 
         if(($request->get($this->meeting_time_start) < $timeNow) || 
            ($meeting_end_date->day != $meeting_start_date->day)){
-            return response()->json(['Status' => 'Datetime is Invalid'], 400);
+            return response()->json(['Status' => 'fail', 'Message' => 'datetime is invalid'], 400);
         }
 
         if($request->get($this->meeting_time_start) >= $request->get($this->meeting_time_end)){
-            return response()->json(['Status' => 'Start Time Should Be Less Then End Time'], 400);
+            return response()->json(['Status' => 'fail', 'Message' => 'start time sould be less then end time'], 400);
         }
         
         // $booking = new Booking();
@@ -582,14 +588,16 @@ class BookingController extends Controller
 
         if(count($rooms_not_booked_arr) == 0){
             $rooms_not_booked_jason = [
-                'Status' => 'No Room Available',
-                'value' => $rooms_not_booked_arr
+                'Status' => 'success',
+                'Message' => 'no room available',
+                'Value' => $rooms_not_booked_arr
             ];
             return response()->json($rooms_not_booked_jason, 200);
         }else{
             $rooms_not_booked_jason = [
-                'Status' => 'These Rooms are Available',
-                'value' => $rooms_not_booked_arr
+                'Status' => 'success',
+                'Message' => 'these rooms are available',
+                'Value' => $rooms_not_booked_arr
             ];
             return response()->json($rooms_not_booked_jason, 200);
         }    
@@ -604,25 +612,25 @@ class BookingController extends Controller
             is_null($request->get($this->meeting_time_end)) ||
             is_null($request->get("guests"))
         ){
-            return response()->json(['Status' => 'Some Value Might be Null'], 400);
+            return response()->json(['Status' => 'fail', 'Message' => 'some value might be null'], 400);
         }
 
         $userTable = User::where($this->one_email , '=', $request->get($this->one_email))->first();
         if($userTable == null){
-            return response()->json(['Status' => 'Booking One Email is Invalid'], 401);
+            return response()->json(['Status' => 'fail', 'Message' => 'booking email is invalid'], 400);
         }
 
         if($this->checkAvailableRoom($request)->getStatusCode() == 200) {
-            $rooms_available_arr = $this->checkAvailableRoom($request)->getData()->value;
+            $rooms_available_arr = $this->checkAvailableRoom($request)->getData()->Value;
             $user_room_select_stat = false;
         }else{
-            return response()->json(['Status' => 'Select Room Not Available'], 400);
+            return response()->json(['Status' => 'fail', 'Message' => 'room not available'], 400);
         }
 
         $guests = $request->get("guests");
         foreach($guests as $g){
             if($g == $request->get($this->one_email)){
-                return response()->json(['Status' => 'Booking Email Cannot be Guest'], 400);
+                return response()->json(['Status' => 'fail', 'Message' => 'booking email cannot be guest'], 400);
             }
         }
 
@@ -656,27 +664,27 @@ class BookingController extends Controller
                 $guest->save();
             }
 
-            return response()->json(['Status' => 'Booking Successful', 'Booking Info' => $bookingTable, 'Guests' => $guests], 201);
+            return response()->json(['Status' => 'success', 'Message' => '', 'Booking Info' => $bookingTable, 'Guests' => $guests], 201);
         }else{
-            return response()->json(['Status' => 'Select Room Not Available'], 400);
+            return response()->json(['Status' => 'fail', 'Message' => 'room not available'], 400);
         }
     }
 
     public function ejectBooking($one_email = null, $booking_number = null){
         
         if(is_null($booking_number) || is_null($one_email)){
-            return response()->json(['Status' => 'Booking Number or One Email Can Not be Null'], 404);
+            return response()->json(['Status' => 'fail', 'Message' => 'some value might be null'], 400);
         }else{
             $bookingTable = Booking::where($this->booking_num , '=', $booking_number)
                                     ->where($this->one_email , '=', $one_email)    
                                     ->first();
 
             if(is_null($bookingTable)){
-                return response()->json(['Status' => 'Booking Number is Invalid'], 404);
+                return response()->json(['Status' => 'fail', 'Message' => 'booking number is invalid'], 400);
             }
 
             if(!is_null($bookingTable->eject_at)){
-                return response()->json(['Status' => 'This Booking is Already Eject', 'Eject at' => $bookingTable->eject_at], 400);
+                return response()->json(['Status' => 'fail','Message' => 'this booking number already eject', 'Eject at' => $bookingTable->eject_at], 400);
             }
 
             $timeNow = Carbon::now();
@@ -687,7 +695,7 @@ class BookingController extends Controller
                                     ->update([$this->eject => $timeNow]);
 
             $bookingTable = Booking::where($this->booking_num , '=', $booking_number)->first();
-            return response()->json(['Status' => 'Eject Successful', 'Eject at' =>  $bookingTable->eject_at], 200);
+            return response()->json(['Status' => 'success', 'Message' => '', 'Eject at' =>  $bookingTable->eject_at], 200);
         }
 
     }
@@ -697,7 +705,7 @@ class BookingController extends Controller
         // $request = $client->get('http://192.168.72.24:8001/api/v1/bookingTable/nitchakarn.ho@one.th/time/2021-02-10');
         // $response = $request->getBody();
         // dd($response->getContents());
-
+        
         $bot_token = 'Bearer Af58c5450f3b45c71a97bc51c05373ecefabc49bd2cd94f3c88d5b844813e69a17e26a828c2b64ef889ef0c10e2aee347';
         $bot_id = 'B75900943c6205ce084d1c5e8850d40f9';
         $client = new \GuzzleHttp\Client();
@@ -716,13 +724,24 @@ class BookingController extends Controller
             ]);
             $response = json_decode($request->getBody()->getContents());
         }catch (\Exception $ex) {
-            return response()->json(['Status' => $ex->getResponse()->getReasonPhrase()], $ex->getResponse()->getStatusCode());
+            // return response()->json(['Status' => $ex->getResponse()->getReasonPhrase()], $ex->getResponse()->getStatusCode());
+            if(($ex->getResponse()->getStatusCode() == 401)){
+                $m = 'token invalid';
+            }else if(($ex->getResponse()->getStatusCode() == 400)){
+                $m = 'bad request';
+            }else if(($ex->getResponse()->getStatusCode() == 500)){
+                $m = 'server error';
+            }else{
+                $m = '';
+            }
+            return response()->json([ 'Status' => 'fail',
+                                      'Message' => $m
+                                    ], $ex->getResponse()->getStatusCode());
         }
-    
         if($response->status == 'success'){
-            return response()->json(['Status' => $response->status, 'Value' =>  $response->data], 200);
+            return response()->json(['Status' => 'success', 'Message' => '', 'Value' =>  $response->data], 200);
         }else{
-            return response()->json(['Status' => $response->status. ', Token Invalid'], 200);
+            return response()->json(['Status' => 'fail', 'Message' => 'token invalid'], 401);
         }
     }
 
@@ -731,15 +750,15 @@ class BookingController extends Controller
         $client = new \GuzzleHttp\Client();
 
         if(is_null($request->get($this->room_num)) || is_null($request->get($this->one_email))){
-            return response()->json([ 'Status' => 'Fail',
-                                      'Message' => 'Some Value Might be Null'
+            return response()->json([ 'Status' => 'fail',
+                                      'Message' => 'some value might be null'
                                     ], 400);
         }
         
         $rooms = Room::where($this->room_num, '=', $request->get($this->room_num))->first();
         if(is_null($rooms)){
-            return response()->json([ 'Status' => 'Fail',
-                                      'Message' => 'Room Number is Invalid'
+            return response()->json([ 'Status' => 'fail',
+                                      'Message' => 'room number is invalid'
                                     ], 404);
         }
 
@@ -758,19 +777,28 @@ class BookingController extends Controller
                 ]);
                 $response = json_decode($request->getBody()->getContents());
             } catch (\Exception $ex) {
-                return response()->json([ 'Status' => 'Fail',
-                                          'Message' => $ex->getResponse()->getReasonPhrase()
+                if(($ex->getResponse()->getStatusCode() == 401)){
+                    $m = 'token invalid';
+                }else if(($ex->getResponse()->getStatusCode() == 400)){
+                    $m = 'bad request';
+                }else if(($ex->getResponse()->getStatusCode() == 500)){
+                    $m = 'server error';
+                }else{
+                    $m = '';
+                }
+                return response()->json([ 'Status' => 'fail',
+                                          'Message' => $m
                                         ], $ex->getResponse()->getStatusCode());
             }
 
             if($response->result[0]->door_action == 'open'){
-                return response()->json([ 'Status' => 'Success', 
-                                          'Message' => 'Main Door Accessed',
+                return response()->json([ 'Status' => 'success', 
+                                          'Message' => 'main door accessed',
                                           'Value' => $response
                                         ], 200);
             }else{
-                return response()->json([ 'Status' => 'Success', 
-                                          'Message' => 'Cannot Access Main Door',
+                return response()->json([ 'Status' => 'success', 
+                                          'Message' => 'cannot access main door',
                                           'Value' => $response
                                         ], 200);
             } 
@@ -804,8 +832,8 @@ class BookingController extends Controller
         }
         
         if(count($booking_table) == 0 && count($guest_table) == 0){
-            return response()->json([ 'Status' => 'Success', 
-                                      'Message' => 'Cannot Access Meeting Room',
+            return response()->json([ 'Status' => 'success', 
+                                      'Message' => 'cannot access meeting room',
                                     ], 200);
         }else{
             try {
@@ -820,13 +848,21 @@ class BookingController extends Controller
                 ]);
                 $response = json_decode($request->getBody()->getContents());
             } catch (\Exception $ex) {
-                return response()->json([ 'Status' => 'Fail',
-                                          'Message' => $ex->getResponse()->getReasonPhrase()
+                if(($ex->getResponse()->getStatusCode() == 401)){
+                    $m = 'token invalid';
+                }else if(($ex->getResponse()->getStatusCode() == 400)){
+                    $m = 'bad request';
+                }else if(($ex->getResponse()->getStatusCode() == 500)){
+                    $m = 'server error';
+                }else{
+                    $m = '';
+                }
+                return response()->json([ 'Status' => 'fail',
+                                          'Message' => $m
                                         ], $ex->getResponse()->getStatusCode());
             }
-
-            return response()->json([ 'Status' => 'Success', 
-                                          'Message' => 'Meeting Room Accessed',
+            return response()->json([ 'Status' => 'success', 
+                                          'Message' => 'meeting room accessed',
                                           'Value' => $response
                                         ], 200);
         }
