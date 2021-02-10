@@ -137,6 +137,13 @@ class BookingController extends Controller
             foreach($guests as $g){
                 array_push($guests_arr, $g->guest_email);
             }
+
+            if(Carbon::parse($booking->meeting_start)->day < 10){
+                $day = "0" . Carbon::parse($booking->meeting_start)->day;
+            }else{
+                $day = "" . Carbon::parse($booking->meeting_start)->day;
+            }
+
             $booking_data_json[] = [
                 "booking_number" => $booking->booking_number,
                 "one_email" => $booking->one_email,
@@ -144,7 +151,7 @@ class BookingController extends Controller
                 "room_num" => $booking->room_num,
                 "agenda" => $booking->agenda,
                 "meeting_start" => $booking->meeting_start,
-                "meeting_start_day" => Carbon::parse($booking->meeting_start)->day,
+                "meeting_start_day" => $day,
                 "meeting_end" => $booking->meeting_end,
                 // "created_at" => $booking->created_at,
                 "eject_at" => $booking->eject_at
@@ -185,6 +192,13 @@ class BookingController extends Controller
                 foreach($guests as $g){
                     array_push($guests_arr, $g->guest_email);
                 }
+
+                if(Carbon::parse($booking->meeting_start)->day < 10){
+                    $day = "0" . Carbon::parse($booking->meeting_start)->day;
+                }else{
+                    $day = "" . Carbon::parse($booking->meeting_start)->day;
+                }
+
                 $booking_data_this_month[] = [
                     "booking_number" => $booking->booking_number,
                     "one_email" => $booking->one_email,
@@ -192,7 +206,7 @@ class BookingController extends Controller
                     "room_num" => $booking->room_num,
                     "agenda" => $booking->agenda,
                     "meeting_start" => $booking->meeting_start,
-                    "meeting_start_day" => Carbon::parse($booking->meeting_start)->day,
+                    "meeting_start_day" => $day,
                     "meeting_end" => $booking->meeting_end,
                     // "created_at" => $booking->created_at,
                     "eject_at" => $booking->eject_at
@@ -248,6 +262,13 @@ class BookingController extends Controller
                     foreach($guests as $g){
                         array_push($guests_arr, $g->guest_email);
                     }
+
+                    if(Carbon::parse($booking->meeting_start)->day < 10){
+                        $day = "0" . Carbon::parse($booking->meeting_start)->day;
+                    }else{
+                        $day = "" . Carbon::parse($booking->meeting_start)->day;
+                    }
+    
                     $booking_data_json[] = [
                         "booking_number" => $booking->booking_number,
                         "one_email" => $booking->one_email,
@@ -255,7 +276,7 @@ class BookingController extends Controller
                         "room_num" => $booking->room_num,
                         "agenda" => $booking->agenda,
                         "meeting_start" => $booking->meeting_start,
-                        "meeting_start_day" => Carbon::parse($booking->meeting_start)->day,
+                        "meeting_start_day" => $day,
                         "meeting_end" => $booking->meeting_end,
                         // "created_at" => $booking->created_at,
                         "eject_at" => $booking->eject_at,
@@ -355,6 +376,13 @@ class BookingController extends Controller
                     foreach($guests as $g){
                         array_push($guests_arr, $g->guest_email);
                     }
+
+                    if(Carbon::parse($booking->meeting_start)->day < 10){
+                        $day = "0" . Carbon::parse($booking->meeting_start)->day;
+                    }else{
+                        $day = "" . Carbon::parse($booking->meeting_start)->day;
+                    }
+    
                     $booking_data_json[] = [
                         "booking_number" => $booking->booking_number,
                         "one_email" => $booking->one_email,
@@ -362,7 +390,7 @@ class BookingController extends Controller
                         "room_num" => $booking->room_num,
                         "agenda" => $booking->agenda,
                         "meeting_start" => $booking->meeting_start,
-                        "meeting_start_day" => Carbon::parse($booking->meeting_start)->day,
+                        "meeting_start_day" => $day,
                         "meeting_end" => $booking->meeting_end,
                         // "created_at" => $booking->created_at,
                         "eject_at" => $booking->eject_at,
@@ -421,6 +449,13 @@ class BookingController extends Controller
                     foreach($guests as $g){
                         array_push($guests_arr, $g->guest_email);
                     }
+
+                    if(Carbon::parse($booking->meeting_start)->day < 10){
+                        $day = "0" . Carbon::parse($booking->meeting_start)->day;
+                    }else{
+                        $day = "" . Carbon::parse($booking->meeting_start)->day;
+                    }
+    
                     $booking_data_json[] = [
                         "booking_number" => $booking->booking_number,
                         "one_email" => $booking->one_email,
@@ -428,7 +463,7 @@ class BookingController extends Controller
                         "room_num" => $booking->room_num,
                         "agenda" => $booking->agenda,
                         "meeting_start" => $booking->meeting_start,
-                        "meeting_start_day" => Carbon::parse($booking->meeting_start)->day,
+                        "meeting_start_day" => $day,
                         "meeting_end" => $booking->meeting_end,
                         // "created_at" => $booking->created_at,
                         "eject_at" => $booking->eject_at,
