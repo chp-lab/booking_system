@@ -30,6 +30,22 @@ class BookingController extends Controller
     public $meeting_start_get;
     public $meeting_end_get;
 
+    public function test(){
+        $timeNow = Carbon::now();
+        $timeNow->tz = new \DateTimeZone('Asia/Bangkok');
+        $data[] = [
+            "name" => "number of server deployed",
+            "value" => 3
+        ];
+        $data[] = [
+            "name" => "time when request",
+            "value" => $timeNow->isoFormat('dddd D-MM-YYYY HH:mm:ss')
+        ];
+        return response()->json(['Status' => 'success',
+                                 'Message' => "this is test api",
+                                 'Value' => $data
+                                ],200);
+    }
 
     public function availableStat($day = null){
 
@@ -910,8 +926,6 @@ class BookingController extends Controller
                                         ], 200);
         }
     }
-
-
 
 
     /**

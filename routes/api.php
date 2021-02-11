@@ -31,6 +31,7 @@ Route::group(['middleware' => ['cors']], function () {
     Route::get('v1/getProfile/{user_token?}', 'App\Http\Controllers\BookingController@getProfile')->middleware('log.route');
     Route::get('v1/nowMeetingTable/{room_num?}', 'App\Http\Controllers\BookingController@nowMeetingTable')->middleware('log.route');
     Route::get('v1/availableStat/{day?}', 'App\Http\Controllers\BookingController@availableStat')->middleware('log.route');
+    Route::get('v1/test', 'App\Http\Controllers\BookingController@test')->middleware('log.route');
 
 });
 
