@@ -20,8 +20,13 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 
 Route::group(['middleware' => ['cors']], function () {
+
+    Route::get('v1/dev/{one_email?}/{select?}/{date?}', 'App\Http\Controllers\BookingController@dev')->middleware('log.route');
+
+
     Route::post('v1/checkAvailableRoom', 'App\Http\Controllers\BookingController@checkAvailableRoom')->middleware('log.route');
     Route::post('v1/booking', 'App\Http\Controllers\BookingController@booking')->middleware('log.route');
+    Route::post('v1/guestManager/{select?}', 'App\Http\Controllers\BookingController@guestManager')->middleware('log.route');
     Route::post('v1/unlock/{user_token?}', 'App\Http\Controllers\BookingController@unlock')->middleware('log.route');
     Route::get('v1/ejectBooking/{one_email?}/{booking_number?}', 'App\Http\Controllers\BookingController@ejectBooking')->middleware('log.route');
 
