@@ -435,7 +435,11 @@ class BookingController extends Controller
         $timeNow->tz = new \DateTimeZone('Asia/Bangkok');
         $data[] = [
             "name" => "number of server deployed",
-            "value" => 3
+            "value" => 4
+        ];
+        $data[] = [
+            "name" => "db host",
+            "value" => env("DB_HOST")
         ];
         $data[] = [
             "name" => "time when request",
